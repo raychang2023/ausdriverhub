@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "playwright": {
+      "name": "Playwright (Automation + MCP + Scraper)",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=playwright",
+      "source": "skillhub",
+      "version": "1.0.3"
+    },
+    "json": {
+      "name": "JSON",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=json",
+      "source": "skillhub",
+      "version": "1.0.0"
+    },
+    "cron": {
+      "name": "Cron",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=cron",
+      "source": "skillhub",
+      "version": "1.0.0"
+    },
+    "scheduler": {
+      "name": "Scheduler",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=scheduler",
+      "source": "skillhub",
+      "version": "2.0.0"
+    },
+    "telegram": {
+      "name": "Telegram",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=telegram",
+      "source": "skillhub",
+      "version": "1.0.1"
+    },
+    "feishu-sheets-skill": {
+      "name": "Feishu Sheets Skill",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=feishu-sheets-skill",
+      "source": "skillhub",
+      "version": "1.0.0"
+    }
+  }
+}
