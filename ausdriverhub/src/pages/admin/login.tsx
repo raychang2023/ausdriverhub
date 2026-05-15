@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { supabase } from "@/lib/supabase"
+import { supabase, pbAuth } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 
 export default function AdminLogin() {
@@ -36,12 +36,31 @@ export default function AdminLogin() {
     setError(null)
     if (!email || !password) { setError("Please enter your email and password."); return }
     setLoading(true)
+
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      try {
+        const result = await pbAuth(email, password)
+        if (result.rememberMe) {
+          localStorage.setItem("admin_email", email)
+          localStorage.setItem("admin_password", password)
+        } else {
+          localStorage.removeItem("admin_email")
+          localStorage.removeItem("admin_password")
+        }
+        navigate("/admin/dashboard")
+      } catch (err) {
+        setError("Incorrect email or password. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (authError) {
       setError(authError.message.toLowerCase().includes("invalid") ? "Incorrect email or password. Please try again." : authError.message)
     } else {
-      // 保存或清除记住的账号密码
       if (rememberMe) {
         localStorage.setItem("admin_email", email)
         localStorage.setItem("admin_password", password)

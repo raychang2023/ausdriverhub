@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { AdminLayout } from "@/components/layout/admin-layout"
-import { supabase, type DriverRegistration } from "@/lib/supabase"
+import { supabase, pbListRecords, pbUpdateRecord, pbGetRecord, type DriverRegistration } from "@/lib/supabase"
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200",
@@ -41,6 +41,11 @@ export default function AdminDashboard() {
   }, [])
 
   async function deleteRegistration(id: string) {
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      // PocketBase: delete is not exposed yet, skip for now
+      setRegistrations((prev) => prev.filter((r) => r.id !== id))
+      return
+    }
     await supabase.from("driverdocuments").delete().eq("registrationid", id)
     await supabase.from("driverregistrations").delete().eq("id", id)
     setRegistrations((prev) => prev.filter((r) => r.id !== id))
@@ -48,6 +53,24 @@ export default function AdminDashboard() {
 
   async function fetchRegistrations() {
     setLoading(true)
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      const items = await pbListRecords("driverregistrations")
+      const mapped: DriverRegistration[] = items.map((r: Record<string, unknown>) => ({
+        id: r.id as string,
+        fullname: (r.fullname as string) || "",
+        phone: (r.phone as string) || "",
+        address: (r.address as string) || "",
+        city: (r.city as DriverRegistration["city"]) || "Sydney",
+        availabledays: ((r.availabledays as string) || "").split(",").filter(Boolean),
+        pdfurl: (r.pdfurl as string) || null,
+        status: (r.status as DriverRegistration["status"]) || "pending",
+        created_at: (r.created as string) || "",
+        tenant_id: (r.tenant_id as string) || null,
+      }))
+      setRegistrations(mapped)
+      setLoading(false)
+      return
+    }
     const { data, error } = await supabase
       .from("driverregistrations")
       .select("*")
@@ -120,7 +143,14 @@ export default function AdminDashboard() {
             Submitted <ArrowUpDown className="h-3.5 w-3.5" />
           </button>
         ),
-        cell: (info) => new Date(info.getValue()).toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" }),
+        cell: (info) => {
+          const val = info.getValue()
+          if (!val) return <span className="text-xs text-muted-foreground">—</span>
+          const d = new Date(val)
+          return isNaN(d.getTime())
+            ? <span className="text-xs text-muted-foreground">—</span>
+            : d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" })
+        },
       }),
       columnHelper.display({
         id: "actions",

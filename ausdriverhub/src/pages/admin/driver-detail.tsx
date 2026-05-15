@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { AdminLayout } from "@/components/layout/admin-layout"
-import { supabase, DAYS_OF_WEEK, DOCUMENT_TYPE_LABELS, type DriverDocument, type DriverRegistration } from "@/lib/supabase"
+import { supabase, pbGetRecord, pbListRecords, pbUpdateRecord, DAYS_OF_WEEK, DOCUMENT_TYPE_LABELS, type DriverDocument, type DriverRegistration } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; classes: string }> = {
@@ -47,6 +47,40 @@ export default function DriverDetail() {
 
   async function fetchDriver(driverId: string) {
     setLoading(true)
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      try {
+        const reg = await pbGetRecord("driverregistrations", driverId)
+        const docs = await pbListRecords("driverdocuments", `registrationid = "${driverId}"`)
+        if (reg) setRegistration({
+          id: reg.id as string,
+          fullname: (reg.fullname as string) || "",
+          phone: (reg.phone as string) || "",
+          address: (reg.address as string) || "",
+          city: (reg.city as DriverRegistration["city"]) || "Sydney",
+          availabledays: ((reg.availabledays as string) || "").split(",").filter(Boolean),
+          pdfurl: (reg.pdfurl as string) || null,
+          status: (reg.status as DriverRegistration["status"]) || "pending",
+          created_at: (reg.created as string) || "",
+          tenant_id: (reg.tenant_id as string) || null,
+        } as DriverRegistration)
+        if (docs) setDocuments(docs.map((d) => {
+          const fu = (d.fileupload as string) || ""
+          const url = (d.fileurl as string) || (fu ? `${window.location.origin}/api/files/driverdocuments/${d.id}/${fu}` : "")
+          return {
+            id: d.id as string,
+            registrationid: d.registrationid as string,
+            documenttype: d.documenttype as DriverDocument["documenttype"],
+            fileurl: url,
+            filename: d.filename as string || "",
+            createdat: (d.created as string) || "",
+          } as DriverDocument
+        }))
+      } catch (e) {
+        console.error("PB fetch error", e)
+      }
+      setLoading(false)
+      return
+    }
     const [{ data: reg }, { data: docs }] = await Promise.all([
       supabase.from("driverregistrations").select("*").eq("id", driverId).maybeSingle(),
       supabase.from("driverdocuments").select("*").eq("registrationid", driverId).order("documenttype"),
@@ -59,6 +93,10 @@ export default function DriverDetail() {
   async function deleteRegistration() {
     if (!registration) return
     setDeleting(true)
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      navigate("/admin/dashboard")
+      return
+    }
     await supabase.from("driverdocuments").delete().eq("registrationid", registration.id)
     await supabase.from("driverregistrations").delete().eq("id", registration.id)
     navigate("/admin/dashboard")
@@ -67,6 +105,12 @@ export default function DriverDetail() {
   async function updateStatus(newStatus: string) {
     if (!registration) return
     setUpdatingStatus(true)
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      await pbUpdateRecord("driverregistrations", registration.id, { status: newStatus })
+      setRegistration((prev) => prev ? { ...prev, status: newStatus as DriverRegistration["status"] } : prev)
+      setUpdatingStatus(false)
+      return
+    }
     const { error } = await supabase.from("driverregistrations").update({ status: newStatus }).eq("id", registration.id)
     if (!error) setRegistration((prev) => prev ? { ...prev, status: newStatus as DriverRegistration["status"] } : prev)
     setUpdatingStatus(false)

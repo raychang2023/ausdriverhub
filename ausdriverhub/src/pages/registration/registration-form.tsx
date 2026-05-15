@@ -14,6 +14,7 @@ import { FileUpload, type UploadedFile } from "@/components/file-upload"
 import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { PublicHeader } from "@/components/layout/public-header"
 import { supabase, DAYS_OF_WEEK, CITIES, type City } from "@/lib/supabase"
+import { pbCreateRecord, pbUploadFile as pbFileUpload, pbUpdateRecord } from "@/lib/supabase"
 import { generateDriverPDF } from "@/lib/pdf-generator"
 import type { DriverDocument, DriverRegistration } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
@@ -82,6 +83,29 @@ export default function RegistrationForm() {
   }
 
   async function uploadFile(file: File, registrationId: string, type: string, index = 0): Promise<string> {
+    // PocketBase mode (set VITE_USE_POCKETBASE=true when building for test)
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      // PocketBase: create doc record, upload file to it
+      const doc = await pbCreateRecord("driverdocuments", {
+        registrationid: registrationId,
+        documenttype: type,
+        filename: file.name,
+        fileurl: "",
+      })
+      const docId = String((doc as any).id)
+      // Upload file to the doc record's fileupload field
+      const formData = new FormData()
+      formData.append("fileupload", file)
+      const res = await fetch(window.location.origin + "/api/collections/driverdocuments/records/" + docId, {
+        method: "PATCH",
+        body: formData,
+      })
+      if (!res.ok) throw new Error("PB upload: " + (await res.text()))
+      const updated = await res.json()
+      const filename = String((updated as any).fileupload || "")
+      return window.location.origin + "/api/files/driverdocuments/" + docId + "/" + filename
+    }
+    // Supabase: upload to storage bucket
     const ext = file.name.split(".").pop() || "jpg"
     const path = `${registrationId}/${type}-${index}-${Date.now()}.${ext}`
     const { error } = await supabase.storage.from("driver-documents").upload(path, file, { upsert: true })
@@ -95,60 +119,105 @@ export default function RegistrationForm() {
     setIsSubmitting(true)
     setSubmitError(null)
 
+    const isTest = typeof window !== "undefined" && window.location.hostname.indexOf("test.ausdriverhub.com") >= 0
+
     try {
-      // 使用 Supabase 客户端直接插入
-      const { data: registration, error: regError } = await supabase
-        .from("driverregistrations")
-        .insert({
+      let regId: string
+      let registration: DriverRegistration
+
+      if (import.meta.env.VITE_USE_POCKETBASE) {
+        // ======== PocketBase path ========
+        const result = await pbCreateRecord("driverregistrations", {
+          fullname: values.full_name,
+          phone: values.phone,
+          address: values.address,
+          city: values.city,
+          availabledays: values.available_days.join(","),
+          status: "pending",
+        })
+        regId = String((result as any).id)
+        registration = {
+          id: regId,
           fullname: values.full_name,
           phone: values.phone,
           address: values.address,
           city: values.city,
           availabledays: values.available_days,
-        })
-        .select()
-        .single()
+          pdfurl: null,
+          status: "pending",
+          created_at: (result as any).created || "",
+          tenant_id: null,
+        }
+      } else {
+        // ======== Supabase path ========
+        const { data: reg, error: regError } = await supabase
+          .from("driverregistrations")
+          .insert({
+            fullname: values.full_name,
+            phone: values.phone,
+            address: values.address,
+            city: values.city,
+            availabledays: values.available_days,
+          })
+          .select()
+          .single()
 
-      if (regError || !registration) {
-        throw new Error(regError?.message || "Failed to save registration")
+        if (regError || !reg) throw new Error(regError?.message || "Failed to save registration")
+        registration = reg as DriverRegistration
+        regId = registration.id
       }
 
       const docs: { registrationid: string; documenttype: string; fileurl: string; filename: string }[] = []
 
-      const licenseUrl = await uploadFile(files.license[0].file, registration.id, "license")
-      docs.push({ registrationid: registration.id, documenttype: "license", fileurl: licenseUrl, filename: files.license[0].file.name })
+      const licenseUrl = await uploadFile(files.license[0].file, regId, "license")
+      docs.push({ registrationid: regId, documenttype: "license", fileurl: licenseUrl, filename: files.license[0].file.name })
 
-      const passportUrl = await uploadFile(files.passport[0].file, registration.id, "passport")
-      docs.push({ registrationid: registration.id, documenttype: "passport", fileurl: passportUrl, filename: files.passport[0].file.name })
+      const passportUrl = await uploadFile(files.passport[0].file, regId, "passport")
+      docs.push({ registrationid: regId, documenttype: "passport", fileurl: passportUrl, filename: files.passport[0].file.name })
 
       for (let i = 0; i < files.vehicle.length; i++) {
-        const vehicleUrl = await uploadFile(files.vehicle[i].file, registration.id, "vehicle", i)
-        docs.push({ registrationid: registration.id, documenttype: "vehicle", fileurl: vehicleUrl, filename: files.vehicle[i].file.name })
+        const vehicleUrl = await uploadFile(files.vehicle[i].file, regId, "vehicle", i)
+        docs.push({ registrationid: regId, documenttype: "vehicle", fileurl: vehicleUrl, filename: files.vehicle[i].file.name })
       }
 
-      const { data: savedDocs, error: docsError } = await supabase
-        .from("driverdocuments")
-        .insert(docs)
-        .select()
+      let savedDocs: DriverDocument[]
 
-      if (docsError) {
-        throw new Error(docsError.message || "Failed to save documents")
+      if (import.meta.env.VITE_USE_POCKETBASE) {
+        // PocketBase: doc records already created in uploadFile, build savedDocs
+        savedDocs = docs.map((d, idx) => ({
+          id: "doc-" + idx,
+          registrationid: regId,
+          documenttype: d.documenttype as DriverDocument["documenttype"],
+          fileurl: d.fileurl,
+          filename: d.filename,
+          createdat: "",
+        }))
+      } else {
+        const { data: sd, error: docsError } = await supabase
+          .from("driverdocuments")
+          .insert(docs)
+          .select()
+        if (docsError) throw new Error(docsError.message || "Failed to save documents")
+        savedDocs = sd as DriverDocument[]
       }
 
-      const fullRegistration: DriverRegistration = { ...registration, driverdocuments: savedDocs as DriverDocument[] }
-      const pdfBlob = await generateDriverPDF(fullRegistration, savedDocs as DriverDocument[])
-      const pdfPath = `${registration.id}/registration-${registration.id}.pdf`
-      await supabase.storage.from("driver-documents").upload(pdfPath, pdfBlob, { contentType: "application/pdf", upsert: true })
-      const { data: { publicUrl: pdfUrl } } = supabase.storage.from("driver-documents").getPublicUrl(pdfPath)
+      const fullRegistration: DriverRegistration = { ...registration, driverdocuments: savedDocs }
+      const pdfBlob = await generateDriverPDF(fullRegistration, savedDocs)
 
-      // 更新 PDF URL
-      const { error: updateError } = await supabase
-        .from("driverregistrations")
-        .update({ pdfurl: pdfUrl })
-        .eq("id", registration.id)
+      if (import.meta.env.VITE_USE_POCKETBASE) {
+        // PocketBase: store pdfurl
+        await pbUpdateRecord("driverregistrations", regId, { pdfurl: "" })
+      } else {
+        const pdfPath = `${regId}/registration-${regId}.pdf`
+        await supabase.storage.from("driver-documents").upload(pdfPath, pdfBlob, { contentType: "application/pdf", upsert: true })
+        const { data: { publicUrl: pdfUrl } } = supabase.storage.from("driver-documents").getPublicUrl(pdfPath)
 
-      if (updateError) {
-        console.error("Failed to update PDF URL:", updateError)
+        const { error: updateError } = await supabase
+          .from("driverregistrations")
+          .update({ pdfurl: pdfUrl })
+          .eq("id", regId)
+
+        if (updateError) console.error("Failed to update PDF URL:", updateError)
       }
 
       setIsSuccess(true)
