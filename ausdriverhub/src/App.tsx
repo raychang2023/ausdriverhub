@@ -7,6 +7,7 @@ import OnboardingGuide from "@/pages/onboarding-guide"
 import RegistrationForm from "@/pages/registration/registration-form"
 import AdminLogin from "@/pages/admin/login"
 import AdminDashboard from "@/pages/admin/dashboard"
+import AdminApplications from "@/pages/admin/applications"
 import DriverDetail from "@/pages/admin/driver-detail"
 
 export function App() {
@@ -30,7 +31,7 @@ export function App() {
           path="/admin/applications"
           element={
             <ProtectedRoute>
-              <AdminDashboard />
+              <AdminApplications />
             </ProtectedRoute>
           }
         />

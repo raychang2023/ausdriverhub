@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { pbCreateRecord, supabase } from "@/lib/supabase"
 import heroImage from "@/assets/driver-network-hero.webp"
 import heroImage2 from "@/assets/driver-network-hero-2.webp"
 import heroImage3 from "@/assets/driver-network-hero-3.webp"
@@ -147,6 +148,8 @@ export default function Home() {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentHeroSlide, setCurrentHeroSlide] = useState(0)
 
   useEffect(() => {
@@ -163,9 +166,35 @@ export default function Home() {
     target?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setSubmitted(true)
+    const formData = new FormData(event.currentTarget)
+    const application = {
+      fullname: String(formData.get("fullName") || "").trim(),
+      mobile: String(formData.get("mobile") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      state: String(formData.get("state") || "").trim(),
+      suburb: String(formData.get("suburb") || "").trim(),
+      postcode: String(formData.get("postcode") || "").trim(),
+      status: "new",
+    }
+
+    setSubmitError(null)
+    setIsSubmitting(true)
+    try {
+      if (import.meta.env.VITE_USE_POCKETBASE) {
+        await pbCreateRecord("driverapplications", application)
+      } else {
+        const { error } = await supabase.from("driverapplications").insert(application)
+        if (error) throw error
+      }
+      setSubmitted(true)
+      event.currentTarget.reset()
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Submission failed. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -427,11 +456,14 @@ export default function Home() {
                   <CheckCircle2 className="mx-auto h-12 w-12 text-[#1683ff]" />
                   <h3 className="mt-4 text-xl font-extrabold text-[#071a2e]">Registration received</h3>
                   <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
-                    Thanks for submitting your details. This homepage form is ready for the driver database flow and does not change the existing onboarding form.
+                    Thanks for submitting your details. Your driver application has been received.
                   </p>
                   <Button
                     className="mt-5 rounded-lg bg-[#1683ff] text-white hover:bg-[#0f72e8]"
-                    onClick={() => setSubmitted(false)}
+                    onClick={() => {
+                      setSubmitted(false)
+                      setSubmitError(null)
+                    }}
                     type="button"
                   >
                     Submit another registration
@@ -446,8 +478,13 @@ export default function Home() {
                   <Field label="City / Suburb" name="suburb" placeholder="Enter your suburb" required />
                   <Field label="Postcode" name="postcode" placeholder="Enter postcode" inputMode="numeric" required />
                   <div className="md:col-span-2">
-                    <Button className="h-12 w-full rounded-lg bg-[#1683ff] text-base font-bold text-white hover:bg-[#0f72e8]" type="submit">
-                      Submit Driver Registration
+                    {submitError && (
+                      <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        {submitError}
+                      </div>
+                    )}
+                    <Button className="h-12 w-full rounded-lg bg-[#1683ff] text-base font-bold text-white hover:bg-[#0f72e8]" disabled={isSubmitting} type="submit">
+                      {isSubmitting ? "Submitting..." : "Submit Driver Registration"}
                       <Send className="h-5 w-5" />
                     </Button>
                     <p className="mt-3 text-center text-xs leading-5 text-slate-500">

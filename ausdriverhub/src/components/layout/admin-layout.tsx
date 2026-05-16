@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
-import { Truck as TruckIcon, ClipboardList, LogOut, Menu, X } from "lucide-react"
+import { Truck as TruckIcon, ClipboardList, LayoutDashboard, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { pbSignOut, supabase } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
@@ -24,6 +24,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   const navLinks = [
+    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/applications", label: "Applications", icon: ClipboardList },
   ]
 
@@ -44,7 +45,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
               const Icon = link.icon
-              const isActive = location.pathname === link.href || (link.href === "/admin/applications" && location.pathname === "/admin/dashboard")
+              const isActive = location.pathname === link.href
               return (
                 <Link
                   key={link.href}
@@ -89,7 +90,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <div className="max-w-7xl mx-auto px-4 py-2 space-y-1">
               {navLinks.map((link) => {
                 const Icon = link.icon
-                const isActive = location.pathname === link.href || (link.href === "/admin/applications" && location.pathname === "/admin/dashboard")
+                const isActive = location.pathname === link.href
                 return (
                   <Link
                     key={link.href}

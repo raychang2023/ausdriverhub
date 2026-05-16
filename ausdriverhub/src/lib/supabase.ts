@@ -199,6 +199,18 @@ export function getPBAuthToken(): string | null {
 export const CITIES = ["Sydney", "Brisbane", "Melbourne", "Townsville", "Cairns", "Mackay"] as const
 export type City = (typeof CITIES)[number]
 
+export type DriverApplication = {
+  id: string
+  fullname: string
+  mobile: string
+  email: string
+  state: string
+  suburb: string
+  postcode: string
+  status: "new" | "contacted" | "archived"
+  created_at: string
+}
+
 export type DriverRegistration = {
   id: string
   fullname: string
