@@ -18,6 +18,7 @@ export function App() {
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/guide" element={<OnboardingGuide />} />
         <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/login" element={<Navigate to="/admin/login" replace />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
           path="/admin/dashboard"
