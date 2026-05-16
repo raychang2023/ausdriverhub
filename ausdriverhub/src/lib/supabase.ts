@@ -196,7 +196,7 @@ export function getPBAuthToken(): string | null {
 // Shared types & constants
 // =============================================================================
 
-export const CITIES = ["Sydney", "Brisbane", "Melbourne"] as const
+export const CITIES = ["Sydney", "Brisbane", "Melbourne", "Townsville", "Cairns", "Mackay"] as const
 export type City = (typeof CITIES)[number]
 
 export type DriverRegistration = {

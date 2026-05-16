@@ -23,7 +23,7 @@ const formSchema = z.object({
   full_name: z.string().min(2, "Full name must be at least 2 characters"),
   phone: z.string().min(8, "Please enter a valid phone number"),
   address: z.string().min(5, "Please enter your full residential address"),
-  city: z.enum(["Sydney", "Brisbane", "Melbourne"]),
+  city: z.enum(CITIES),
   available_days: z.array(z.string()).min(1, "Please select at least one available day"),
 })
 
