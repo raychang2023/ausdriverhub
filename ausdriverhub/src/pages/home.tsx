@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   Box,
@@ -6,6 +6,8 @@ import {
   CalendarClock,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ClipboardCheck,
   Clock3,
   FileText,
@@ -124,10 +126,38 @@ const faqs = [
 
 const states = ["NSW", "VIC", "QLD", "WA", "SA", "ACT", "TAS", "NT"]
 
+const heroSlides = [
+  {
+    src: heroImage,
+    alt: "Delivery driver with van and parcels in an Australian city",
+  },
+  {
+    src: heroImage,
+    alt: "Courier driver preparing parcels beside a delivery van",
+  },
+  {
+    src: heroImage,
+    alt: "Owner driver delivering parcels across Australia",
+  },
+  {
+    src: heroImage,
+    alt: "Australian delivery driver network with city and regional coverage",
+  },
+]
+
 export default function Home() {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCurrentHeroSlide((current) => (current + 1) % heroSlides.length)
+    }, 5000)
+
+    return () => window.clearInterval(timer)
+  }, [])
 
   function scrollToSection(href: string) {
     setIsMenuOpen(false)
@@ -246,13 +276,47 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative min-h-[320px] overflow-hidden rounded-lg border border-white/10 bg-slate-900 shadow-2xl shadow-slate-950/35 lg:min-h-[530px]">
-              <img
-                alt="Delivery driver with van and parcels in an Australian city"
-                className="h-full min-h-[320px] w-full object-cover lg:min-h-[530px]"
-                src={heroImage}
-              />
+            <div className="group relative min-h-[320px] overflow-hidden rounded-lg border border-white/10 bg-slate-900 shadow-2xl shadow-slate-950/35 lg:min-h-[530px]">
+              {heroSlides.map((slide, index) => (
+                <img
+                  alt={slide.alt}
+                  className={`absolute inset-0 h-full min-h-[320px] w-full object-cover transition-opacity duration-700 lg:min-h-[530px] ${
+                    index === currentHeroSlide ? "opacity-100" : "opacity-0"
+                  }`}
+                  key={slide.alt}
+                  src={slide.src}
+                />
+              ))}
               <div className="absolute inset-0 bg-gradient-to-r from-[#061322]/80 via-[#061322]/20 to-transparent lg:from-[#061322]/45" />
+              <button
+                aria-label="Previous hero image"
+                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#061322]/55 text-white opacity-100 backdrop-blur transition hover:bg-[#1683ff] sm:opacity-0 sm:group-hover:opacity-100"
+                onClick={() => setCurrentHeroSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length)}
+                type="button"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                aria-label="Next hero image"
+                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#061322]/55 text-white opacity-100 backdrop-blur transition hover:bg-[#1683ff] sm:opacity-0 sm:group-hover:opacity-100"
+                onClick={() => setCurrentHeroSlide((current) => (current + 1) % heroSlides.length)}
+                type="button"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 rounded-full border border-white/15 bg-[#061322]/55 px-3 py-2 backdrop-blur">
+                {heroSlides.map((slide, index) => (
+                  <button
+                    aria-label={`Show hero image ${index + 1}`}
+                    className={`h-2.5 rounded-full transition-all ${
+                      index === currentHeroSlide ? "w-7 bg-[#1683ff]" : "w-2.5 bg-white/55 hover:bg-white"
+                    }`}
+                    key={slide.alt}
+                    onClick={() => setCurrentHeroSlide(index)}
+                    type="button"
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="grid gap-3 rounded-lg border border-white/10 bg-white/8 p-3 backdrop-blur sm:grid-cols-3 lg:col-span-2 lg:max-w-4xl">
