@@ -44,10 +44,10 @@ type FileErrors = {
 function StepIndicator({ label, icon: Icon }: { label: string; icon: React.ElementType }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
-        <Icon className="h-3.5 w-3.5 text-primary" />
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1683ff]/10">
+        <Icon className="h-4 w-4 text-[#1683ff]" />
       </div>
-      <span className="text-sm font-medium text-foreground">{label}</span>
+      <span className="text-base font-extrabold text-[#071a2e]">{label}</span>
     </div>
   )
 }
@@ -228,33 +228,35 @@ export default function RegistrationForm() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#07111f] text-white">
         <PublicHeader />
-        <div className="max-w-2xl mx-auto px-4 py-16 flex flex-col items-center text-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-10 w-10 text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground mb-3">Registration Submitted!</h2>
-          <p className="text-muted-foreground mb-2 max-w-md">
-            Your driver registration has been received. Our team will review your information and get in touch with you soon.
-          </p>
-          <p className="text-sm text-muted-foreground max-w-md">
-            A PDF copy of your registration has been generated and stored in our system.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 w-full max-w-xs">
-            <Button
-              className="bg-primary text-primary-foreground w-full"
-              onClick={() => { setIsSuccess(false); form.reset(); setFiles({ license: [], passport: [], vehicle: [] }) }}
-            >
-              Submit Another Registration
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate("/")}
-            >
-              Back to Home
-            </Button>
+        <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-16 text-center sm:px-6">
+          <div className="w-full rounded-lg border border-white/10 bg-white p-8 shadow-2xl shadow-slate-950/30">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle2 className="h-10 w-10 text-green-600" />
+            </div>
+            <h2 className="mb-3 text-3xl font-extrabold tracking-tight text-[#071a2e]">Registration Submitted!</h2>
+            <p className="mx-auto mb-2 max-w-md text-slate-600">
+              Your driver registration has been received. Our team will review your information and get in touch with you soon.
+            </p>
+            <p className="mx-auto max-w-md text-sm text-slate-500">
+              A PDF copy of your registration has been generated and stored in our system.
+            </p>
+            <div className="mx-auto mt-8 flex w-full max-w-xs flex-col gap-3">
+              <Button
+                className="h-12 w-full rounded-lg bg-[#1683ff] font-bold text-white hover:bg-[#0f72e8]"
+                onClick={() => { setIsSuccess(false); form.reset(); setFiles({ license: [], passport: [], vehicle: [] }) }}
+              >
+                Submit Another Registration
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 w-full rounded-lg border-slate-200 font-bold text-[#071a2e] hover:bg-slate-50"
+                onClick={() => navigate("/")}
+              >
+                Back to Home
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -262,51 +264,52 @@ export default function RegistrationForm() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#07111f] text-white">
       <PublicHeader />
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-12">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-foreground">Driver Registration</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+      <div className="mx-auto max-w-4xl px-4 py-6 pb-12 sm:px-6 lg:py-10">
+        <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.06] p-5 shadow-2xl shadow-slate-950/30 sm:p-6">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#58a9ff]">Final step</p>
+          <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Driver Registration</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
             Complete the form below to register as a delivery driver. All fields are required.
           </p>
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          <Card className="border-border shadow-sm">
-            <CardHeader className="pb-3 pt-4 px-4">
+          <Card className="rounded-lg border-white/10 bg-white shadow-2xl shadow-slate-950/25">
+            <CardHeader className="px-4 pb-3 pt-4 sm:px-6 sm:pt-5">
               <StepIndicator label="Personal Information" icon={User} />
             </CardHeader>
-            <CardContent className="space-y-4 px-4 pb-4">
+            <CardContent className="grid gap-4 px-4 pb-5 sm:grid-cols-2 sm:px-6">
               <div className="space-y-1.5">
-                <Label htmlFor="full_name">Full Name <span className="text-destructive">*</span></Label>
+                <Label htmlFor="full_name" className="font-semibold text-[#071a2e]">Full Name <span className="text-destructive">*</span></Label>
                 <Input
                   id="full_name"
                   placeholder="e.g. John Smith"
                   {...form.register("full_name")}
                   aria-invalid={!!form.formState.errors.full_name}
-                  className={cn(form.formState.errors.full_name && "border-destructive")}
+                  className={cn("h-11 rounded-lg border-slate-200 bg-white text-[#071a2e]", form.formState.errors.full_name && "border-destructive")}
                 />
                 {form.formState.errors.full_name && (
                   <p className="text-xs text-destructive">{form.formState.errors.full_name.message}</p>
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
+                <Label htmlFor="phone" className="font-semibold text-[#071a2e]">Phone Number <span className="text-destructive">*</span></Label>
                 <Input
                   id="phone"
                   type="tel"
                   placeholder="e.g. 0412 345 678"
                   {...form.register("phone")}
                   aria-invalid={!!form.formState.errors.phone}
-                  className={cn(form.formState.errors.phone && "border-destructive")}
+                  className={cn("h-11 rounded-lg border-slate-200 bg-white text-[#071a2e]", form.formState.errors.phone && "border-destructive")}
                 />
                 {form.formState.errors.phone && (
                   <p className="text-xs text-destructive">{form.formState.errors.phone.message}</p>
                 )}
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="address">Residential Address <span className="text-destructive">*</span></Label>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="address" className="font-semibold text-[#071a2e]">Residential Address <span className="text-destructive">*</span></Label>
                 <Controller
                   name="address"
                   control={form.control}
@@ -318,7 +321,7 @@ export default function RegistrationForm() {
                       onBlur={field.onBlur}
                       placeholder="e.g. 12 Main St, Sydney NSW 2000"
                       aria-invalid={!!fieldState.error}
-                      className={cn(fieldState.error && "border-destructive")}
+                      className={cn("h-11 rounded-lg border-slate-200 bg-white text-[#071a2e]", fieldState.error && "border-destructive")}
                     />
                   )}
                 />
@@ -326,8 +329,8 @@ export default function RegistrationForm() {
                   <p className="text-xs text-destructive">{form.formState.errors.address.message}</p>
                 )}
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="city">City / Region <span className="text-destructive">*</span></Label>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="city" className="font-semibold text-[#071a2e]">City / Region <span className="text-destructive">*</span></Label>
                 <Controller
                   name="city"
                   control={form.control}
@@ -337,7 +340,7 @@ export default function RegistrationForm() {
                         <SelectTrigger
                           id="city"
                           aria-invalid={!!fieldState.error}
-                          className={cn(fieldState.error && "border-destructive")}
+                          className={cn("h-11 rounded-lg border-slate-200 bg-white text-[#071a2e]", fieldState.error && "border-destructive")}
                         >
                           <SelectValue placeholder="Select a city" />
                         </SelectTrigger>
@@ -359,12 +362,12 @@ export default function RegistrationForm() {
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-sm">
-            <CardHeader className="pb-3 pt-4 px-4">
+          <Card className="rounded-lg border-white/10 bg-white shadow-2xl shadow-slate-950/25">
+            <CardHeader className="px-4 pb-3 pt-4 sm:px-6 sm:pt-5">
               <StepIndicator label="Availability" icon={Calendar} />
-              <CardDescription className="text-xs mt-1">Select all the days you are available to work</CardDescription>
+              <CardDescription className="mt-1 text-xs text-slate-500">Select all the days you are available to work</CardDescription>
             </CardHeader>
-            <CardContent className="px-4 pb-4">
+            <CardContent className="px-4 pb-5 sm:px-6">
               <Controller
                 name="available_days"
                 control={form.control}
@@ -377,10 +380,10 @@ export default function RegistrationForm() {
                           <label
                             key={day}
                             className={cn(
-                              "flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors",
+                              "flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-3 transition-colors",
                               isChecked
-                                ? "border-primary bg-primary/8 text-primary"
-                                : "border-border bg-background hover:bg-muted/50",
+                                ? "border-[#1683ff] bg-[#1683ff]/10 text-[#1683ff]"
+                                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
                             )}
                           >
                             <Checkbox
@@ -392,9 +395,9 @@ export default function RegistrationForm() {
                                   field.onChange(field.value.filter((d: string) => d !== day))
                                 }
                               }}
-                              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                              className="data-[state=checked]:border-[#1683ff] data-[state=checked]:bg-[#1683ff]"
                             />
-                            <span className={cn("text-sm font-medium", isChecked ? "text-primary" : "text-foreground")}>
+                            <span className={cn("text-sm font-semibold", isChecked ? "text-[#1683ff]" : "text-[#071a2e]")}>
                               {day.slice(0, 3)}
                             </span>
                           </label>
@@ -410,12 +413,12 @@ export default function RegistrationForm() {
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-sm">
-            <CardHeader className="pb-3 pt-4 px-4">
+          <Card className="rounded-lg border-white/10 bg-white shadow-2xl shadow-slate-950/25">
+            <CardHeader className="px-4 pb-3 pt-4 sm:px-6 sm:pt-5">
               <StepIndicator label="Identity Documents" icon={FileText} />
-              <CardDescription className="text-xs mt-1">Upload clear photos of your documents</CardDescription>
+              <CardDescription className="mt-1 text-xs text-slate-500">Upload clear photos of your documents</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5 px-4 pb-4">
+            <CardContent className="space-y-5 px-4 pb-5 sm:px-6">
               <FileUpload
                 label="Driver License"
                 value={files.license}
@@ -435,12 +438,12 @@ export default function RegistrationForm() {
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-sm">
-            <CardHeader className="pb-3 pt-4 px-4">
+          <Card className="rounded-lg border-white/10 bg-white shadow-2xl shadow-slate-950/25">
+            <CardHeader className="px-4 pb-3 pt-4 sm:px-6 sm:pt-5">
               <StepIndicator label="Vehicle Photos" icon={Car} />
-              <CardDescription className="text-xs mt-1">Upload one or more photos of your vehicle</CardDescription>
+              <CardDescription className="mt-1 text-xs text-slate-500">Upload one or more photos of your vehicle</CardDescription>
             </CardHeader>
-            <CardContent className="px-4 pb-4">
+            <CardContent className="px-4 pb-5 sm:px-6">
               <FileUpload
                 label="Vehicle Photos"
                 multiple
@@ -463,7 +466,7 @@ export default function RegistrationForm() {
             type="submit"
             size="lg"
             disabled={isSubmitting}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 text-base shadow-md"
+            className="h-12 w-full rounded-lg bg-[#1683ff] text-base font-bold text-white shadow-xl shadow-blue-950/25 hover:bg-[#0f72e8]"
           >
             {isSubmitting ? (
               <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Submitting Registration...</>
@@ -472,7 +475,7 @@ export default function RegistrationForm() {
             )}
           </Button>
 
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-center text-xs text-slate-400">
             By submitting, you confirm all information provided is accurate and up-to-date.
           </p>
         </form>
