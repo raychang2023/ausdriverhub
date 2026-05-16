@@ -1,7 +1,7 @@
 /**
  * AusDriverHub - Database Client
  *
- * PRODUCTION (ausdriverhub.com):     Supabase
+ * PRODUCTION (ausdriverhub.com):     Supabase or PocketBase (v0.26+)
  * TEST/DEV (test.ausdriverhub.com):  PocketBase (v0.26+)
  *
  * Components only import from this file — never directly from supabase-js.
@@ -26,13 +26,16 @@ function isPB(): boolean {
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!isPB() && (!supabaseUrl || !supabaseAnonKey)) {
   throw new Error(
     "Missing Supabase environment variables. Please check your .env file."
   )
 }
 
-const supabaseClient: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+const supabaseClient: SupabaseClient = createClient(
+  supabaseUrl || "https://placeholder.supabase.co",
+  supabaseAnonKey || "placeholder",
+)
 
 // =============================================================================
 // PocketBase init (test environment only)
@@ -75,9 +78,13 @@ async function pbFetch<T = unknown>(
   path: string,
   body?: unknown,
 ): Promise<T> {
+  const token = getPBAuthToken()
   const opts: RequestInit = {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
   }
   if (body) opts.body = JSON.stringify(body)
   const res = await fetch(`${window.location.origin}/api${path}`, opts)
@@ -139,6 +146,7 @@ export async function pbUploadFile(
   fieldName: string,
   file: File,
 ): Promise<string> {
+  const token = getPBAuthToken()
   const formData = new FormData()
   formData.append(fieldName, file)
 
@@ -146,6 +154,7 @@ export async function pbUploadFile(
     `${window.location.origin}/api/collections/${collection}/records/${recordId}`,
     {
       method: "PATCH",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       body: formData,
     },
   )

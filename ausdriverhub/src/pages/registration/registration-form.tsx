@@ -14,7 +14,7 @@ import { FileUpload, type UploadedFile } from "@/components/file-upload"
 import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { PublicHeader } from "@/components/layout/public-header"
 import { supabase, DAYS_OF_WEEK, CITIES, type City } from "@/lib/supabase"
-import { pbCreateRecord, pbUpdateRecord } from "@/lib/supabase"
+import { pbCreateRecord, pbUpdateRecord, pbUploadFile } from "@/lib/supabase"
 import { generateDriverPDF } from "@/lib/pdf-generator"
 import type { DriverDocument, DriverRegistration } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
@@ -93,17 +93,7 @@ export default function RegistrationForm() {
         fileurl: "",
       })
       const docId = String((doc as any).id)
-      // Upload file to the doc record's fileupload field
-      const formData = new FormData()
-      formData.append("fileupload", file)
-      const res = await fetch(window.location.origin + "/api/collections/driverdocuments/records/" + docId, {
-        method: "PATCH",
-        body: formData,
-      })
-      if (!res.ok) throw new Error("PB upload: " + (await res.text()))
-      const updated = await res.json()
-      const filename = String((updated as any).fileupload || "")
-      return window.location.origin + "/api/files/driverdocuments/" + docId + "/" + filename
+      return pbUploadFile("driverdocuments", docId, "fileupload", file)
     }
     // Supabase: upload to storage bucket
     const ext = file.name.split(".").pop() || "jpg"

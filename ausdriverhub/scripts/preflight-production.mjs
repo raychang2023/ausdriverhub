@@ -45,8 +45,8 @@ if (mode === "pocketbase") {
   if (!pbDir.includes("/pb-prod/")) {
     warnings.push("Recommended production PocketBase data directory is /var/www/pb-prod/pb_data.")
   }
-  if (!supabaseUrl || !supabaseAnonKey) {
-    warnings.push("Current frontend still expects Supabase env values at build time, even in PocketBase mode.")
+  if (supabaseUrl || supabaseAnonKey) {
+    warnings.push("Supabase env values are ignored by runtime PocketBase branches.")
   }
 }
 

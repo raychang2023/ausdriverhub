@@ -10,6 +10,8 @@ Do not point `ausdriverhub.com` at the test PocketBase data directory.
 - Recommended production PocketBase data: `/var/www/pb-prod/pb_data`
 - `test.ausdriverhub.com` and `ausdriverhub.com` must not share the same `pb_data`.
 
+When production uses PocketBase, uploaded driver files are stored under the production PocketBase `pb_data` directory. Backing up `pb_data` is therefore backing up both database records and local uploaded files.
+
 ## Data Source Decision
 
 Before deploying, confirm where the current production data lives.
@@ -92,11 +94,9 @@ Build settings:
 VITE_USE_POCKETBASE=true npm run build
 ```
 
-The current frontend still requires Supabase env values at build time, even in PocketBase mode:
+Supabase env values are not required for runtime in PocketBase mode. If your deployment system always injects them, they are ignored by PocketBase branches.
 
 ```bash
-VITE_SUPABASE_URL=https://placeholder.supabase.co
-VITE_SUPABASE_ANON_KEY=placeholder
 VITE_USE_POCKETBASE=true
 ```
 
@@ -116,6 +116,16 @@ Production PocketBase collections needed:
 - `suburb` text
 - `postcode` text
 - `status` select/text, default `new`
+
+`driverdocuments` fields used by the frontend:
+
+- `registrationid` relation/text
+- `documenttype` select/text: `license`, `passport`, `vehicle`
+- `filename` text
+- `fileurl` text
+- `fileupload` file
+
+PocketBase API rules should allow public create only where the public forms need it, but list/view/update operations for admin pages should require authentication. The frontend sends the PocketBase auth token for authenticated admin requests.
 
 Nginx for `ausdriverhub.com` must proxy production PocketBase only:
 
@@ -175,3 +185,7 @@ The preflight check blocks the most dangerous mistake: using `/var/www/pb-test/p
 - `/login` redirects to `/admin/login`.
 - Admin login/logout works.
 - Existing uploaded document images and PDF links still open.
+
+## Known PocketBase Difference
+
+In PocketBase mode, identity and vehicle images are stored in PocketBase local file storage. The generated PDF URL is not currently uploaded to PocketBase; PDF handling remains part of the Supabase path unless a dedicated PocketBase PDF file field/collection is added later.
