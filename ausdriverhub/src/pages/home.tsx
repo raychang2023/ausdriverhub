@@ -274,11 +274,11 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="group relative min-h-[320px] overflow-hidden rounded-lg border border-white/10 bg-slate-900 shadow-2xl shadow-slate-950/35 lg:min-h-[530px]">
+            <div className="group relative aspect-[3/2] overflow-hidden rounded-lg border border-white/10 bg-slate-900 shadow-2xl shadow-slate-950/35">
               {heroSlides.map((slide, index) => (
                 <img
                   alt={slide.alt}
-                  className={`absolute inset-0 h-full min-h-[320px] w-full object-contain transition-opacity duration-700 lg:min-h-[530px] ${
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
                     index === currentHeroSlide ? "opacity-100" : "opacity-0"
                   }`}
                   key={slide.alt}
