@@ -19,6 +19,10 @@
 // =============================================================================
 import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 
+function isPB(): boolean {
+  return Boolean(import.meta.env.VITE_USE_POCKETBASE)
+}
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 

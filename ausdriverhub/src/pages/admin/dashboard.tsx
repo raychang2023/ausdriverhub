@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { AdminLayout } from "@/components/layout/admin-layout"
-import { supabase, pbListRecords, pbUpdateRecord, pbGetRecord, type DriverRegistration } from "@/lib/supabase"
+import { supabase, pbListRecords, type DriverRegistration } from "@/lib/supabase"
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200",

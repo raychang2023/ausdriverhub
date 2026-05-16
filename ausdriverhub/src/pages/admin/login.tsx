@@ -39,8 +39,8 @@ export default function AdminLogin() {
 
     if (import.meta.env.VITE_USE_POCKETBASE) {
       try {
-        const result = await pbAuth(email, password)
-        if (result.rememberMe) {
+        await pbAuth(email, password)
+        if (rememberMe) {
           localStorage.setItem("admin_email", email)
           localStorage.setItem("admin_password", password)
         } else {

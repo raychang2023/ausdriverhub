@@ -14,7 +14,7 @@ import { FileUpload, type UploadedFile } from "@/components/file-upload"
 import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { PublicHeader } from "@/components/layout/public-header"
 import { supabase, DAYS_OF_WEEK, CITIES, type City } from "@/lib/supabase"
-import { pbCreateRecord, pbUploadFile as pbFileUpload, pbUpdateRecord } from "@/lib/supabase"
+import { pbCreateRecord, pbUpdateRecord } from "@/lib/supabase"
 import { generateDriverPDF } from "@/lib/pdf-generator"
 import type { DriverDocument, DriverRegistration } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
@@ -118,8 +118,6 @@ export default function RegistrationForm() {
     if (!validateFiles()) return
     setIsSubmitting(true)
     setSubmitError(null)
-
-    const isTest = typeof window !== "undefined" && window.location.hostname.indexOf("test.ausdriverhub.com") >= 0
 
     try {
       let regId: string

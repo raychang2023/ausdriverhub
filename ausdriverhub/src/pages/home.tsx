@@ -1,139 +1,575 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Truck, Briefcase, BookOpen, CircleCheck as CheckCircle, Lock, Info } from "lucide-react"
+import {
+  ArrowRight,
+  Box,
+  Building2,
+  CalendarClock,
+  CheckCircle2,
+  ChevronDown,
+  ClipboardCheck,
+  Clock3,
+  FileText,
+  MapPin,
+  Menu,
+  Navigation,
+  PackageCheck,
+  Send,
+  ShieldCheck,
+  Tag,
+  Truck,
+  UserRound,
+  X,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import heroImage from "@/assets/driver-network-hero.webp"
+
+const navItems = [
+  { label: "Home", href: "#home" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "Coverage", href: "#coverage" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Contact", href: "#contact" },
+]
+
+const trustCards = [
+  {
+    title: "Australia-wide",
+    description: "Opportunities in metro and regional areas",
+    icon: MapPin,
+  },
+  {
+    title: "24/7 online registration",
+    description: "Register anytime, anywhere",
+    icon: Clock3,
+  },
+  {
+    title: "Free signup",
+    description: "It's free to register and easy to get started",
+    icon: Tag,
+  },
+]
+
+const cities = [
+  { name: "Sydney", icon: Building2 },
+  { name: "Melbourne", icon: Building2 },
+  { name: "Brisbane", icon: Navigation },
+  { name: "Perth", icon: Building2 },
+  { name: "Adelaide", icon: Truck },
+  { name: "Canberra", icon: Building2 },
+  { name: "Hobart", icon: MapPin },
+  { name: "Darwin", icon: Navigation },
+]
+
+const driverTypes = [
+  {
+    title: "Parcel delivery drivers",
+    description: "Deliver parcels for couriers, logistics partners and local delivery services.",
+    icon: Box,
+  },
+  {
+    title: "Owner drivers",
+    description: "Use your own vehicle and register your preferred areas.",
+    icon: UserRound,
+  },
+  {
+    title: "Flexible delivery work",
+    description: "Register your availability and preferred work type.",
+    icon: CalendarClock,
+  },
+]
+
+const steps = [
+  {
+    step: "Step 1",
+    title: "Submit your details",
+    description: "Complete the simple registration form with your basic driver information.",
+    icon: FileText,
+  },
+  {
+    step: "Step 2",
+    title: "We review your profile",
+    description: "We review your location, vehicle type, experience and availability.",
+    icon: ClipboardCheck,
+  },
+  {
+    step: "Step 3",
+    title: "Get contacted",
+    description: "If suitable opportunities become available, we may contact you with the next step.",
+    icon: PackageCheck,
+  },
+]
+
+const faqs = [
+  {
+    question: "Is registration free?",
+    answer: "Yes. Drivers can submit their details for free.",
+  },
+  {
+    question: "Do I need my own vehicle?",
+    answer: "Many delivery opportunities require a suitable vehicle. Add your vehicle type in the form.",
+  },
+  {
+    question: "Do I need an ABN?",
+    answer: "Some subcontractor opportunities may require an ABN. You can still register your interest.",
+  },
+  {
+    question: "Are jobs guaranteed?",
+    answer: "No. Registration helps us consider you for suitable opportunities when available.",
+  },
+  {
+    question: "Which areas do you cover?",
+    answer: "We accept registrations from metro and regional areas across Australia.",
+  },
+]
+
+const states = ["NSW", "VIC", "QLD", "WA", "SA", "ACT", "TAS", "NT"]
+const vehicleTypes = ["Car", "Van", "Ute", "Truck", "Motorbike", "Other"]
+const licenceTypes = ["Car licence", "Light rigid", "Medium rigid", "Heavy rigid", "Heavy combination", "Other"]
+const experienceOptions = ["New to delivery", "Less than 1 year", "1-3 years", "3+ years"]
+const availabilityOptions = ["Weekdays", "Weekends", "Evenings", "Flexible"]
+const workTypes = ["Parcel delivery", "Courier runs", "Owner driver", "Flexible delivery work"]
 
 export default function Home() {
   const navigate = useNavigate()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  function scrollToSection(href: string) {
+    setIsMenuOpen(false)
+    const target = document.querySelector(href)
+    target?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setSubmitted(true)
+  }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="bg-primary text-primary-foreground shadow-md">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen overflow-x-hidden bg-[#061322] text-slate-950">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#061322]/95 text-white shadow-lg shadow-slate-950/20 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <button
+            className="text-left text-2xl font-bold tracking-tight"
+            onClick={() => scrollToSection("#home")}
+            type="button"
+          >
+            AusDriver<span className="text-[#1683ff]">Hub</span>
+          </button>
+
+          <nav className="hidden items-center gap-8 text-sm font-semibold lg:flex">
+            {navItems.map((item) => (
+              <button
+                key={item.href}
+                className="text-white/78 transition hover:text-white"
+                onClick={() => scrollToSection(item.href)}
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center rounded-lg bg-primary-foreground/10 p-2">
-              <Truck className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight leading-none">AusDriverHub</h1>
-              <p className="text-xs text-primary-foreground/70 mt-0.5">Driver Onboarding Portal</p>
+            <Button
+              className="hidden h-11 rounded-lg bg-[#1683ff] px-5 font-semibold text-white shadow-lg shadow-blue-950/25 hover:bg-[#0f72e8] sm:inline-flex"
+              onClick={() => scrollToSection("#register")}
+              type="button"
+            >
+              <UserRound className="h-4 w-4" />
+              Register
+            </Button>
+            <button
+              aria-label="Open menu"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/15 text-white lg:hidden"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              type="button"
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <div className="border-t border-white/10 bg-[#061322] px-4 pb-4 lg:hidden">
+            <div className="mx-auto flex max-w-7xl flex-col gap-2 pt-2">
+              {navItems.map((item) => (
+                <button
+                  key={item.href}
+                  className="rounded-lg px-3 py-3 text-left text-sm font-semibold text-white/80 hover:bg-white/8 hover:text-white"
+                  onClick={() => scrollToSection(item.href)}
+                  type="button"
+                >
+                  {item.label}
+                </button>
+              ))}
+              <Button
+                className="mt-2 h-12 w-full rounded-lg bg-[#1683ff] font-semibold text-white hover:bg-[#0f72e8]"
+                onClick={() => scrollToSection("#register")}
+                type="button"
+              >
+                Register as a Driver
+              </Button>
             </div>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-1.5 text-xs font-medium bg-white/10 border-white/20 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground hover:border-white/30 transition-colors"
-            onClick={() => navigate("/admin/login")}
-          >
-            <Lock className="h-3.5 w-3.5" />
-            Admin
-          </Button>
-        </div>
+        )}
       </header>
 
-      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8 space-y-8">
-        <section className="text-center pt-2 pb-2">
-          <div className="flex justify-center mb-4">
-            <div className="flex items-center justify-center rounded-2xl bg-primary/10 p-4">
-              <Truck className="h-10 w-10 text-primary" />
+      <main id="home">
+        <section className="relative overflow-hidden bg-[#061322] text-white">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(22,131,255,0.28),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_55%)]" />
+          <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:pb-16 lg:pt-14">
+            <div className="flex min-w-0 flex-col justify-center">
+              <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm font-semibold text-blue-100">
+                <ShieldCheck className="h-4 w-4 text-[#36a3ff]" />
+                Australia-wide driver registration
+              </p>
+              <h1 className="max-w-3xl text-4xl font-extrabold leading-[0.95] tracking-tight min-[420px]:text-5xl sm:text-6xl lg:text-7xl">
+                Join Australia's Driver Network
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-8 text-slate-200 sm:text-xl">
+                Register your details with AusDriverHub and be considered for delivery driver opportunities across metro and regional Australia.
+              </p>
+              <div className="mt-8 grid gap-3 sm:flex">
+                <Button
+                  className="h-13 w-full rounded-lg bg-[#1683ff] px-7 text-base font-bold text-white shadow-xl shadow-blue-950/25 hover:bg-[#0f72e8] sm:w-auto"
+                  onClick={() => scrollToSection("#register")}
+                  type="button"
+                >
+                  <UserRound className="h-5 w-5" />
+                  Register as a Driver
+                </Button>
+                <Button
+                  className="h-13 w-full rounded-lg border border-white/25 bg-white/5 px-7 text-base font-bold text-white hover:bg-white/12 sm:w-auto"
+                  onClick={() => scrollToSection("#how-it-works")}
+                  type="button"
+                  variant="outline"
+                >
+                  See How It Works
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="relative min-h-[320px] overflow-hidden rounded-lg border border-white/10 bg-slate-900 shadow-2xl shadow-slate-950/35 lg:min-h-[530px]">
+              <img
+                alt="Delivery driver with van and parcels in an Australian city"
+                className="h-full min-h-[320px] w-full object-cover lg:min-h-[530px]"
+                src={heroImage}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#061322]/80 via-[#061322]/20 to-transparent lg:from-[#061322]/45" />
+            </div>
+
+            <div className="grid gap-3 rounded-lg border border-white/10 bg-white/8 p-3 backdrop-blur sm:grid-cols-3 lg:col-span-2 lg:max-w-4xl">
+              {trustCards.map((card) => {
+                const Icon = card.icon
+                return (
+                    <div key={card.title} className="flex min-w-0 items-center gap-4 rounded-lg border border-white/10 bg-[#071a2e]/70 p-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1683ff]">
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                    <div className="min-w-0">
+                      <h2 className="text-base font-bold text-white">{card.title}</h2>
+                      <p className="mt-1 text-sm leading-5 text-slate-300">{card.description}</p>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground mb-2">
-            Aus Driver Hub
-          </h2>
-          <p className="text-base font-medium text-muted-foreground mb-3">
-            Driver Registration &amp; Onboarding Portal
-          </p>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-            Welcome to the driver onboarding portal. Please read the onboarding guide before submitting your driver details to improve review efficiency.
-          </p>
         </section>
 
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Card className="border-border shadow-sm hover:shadow-md transition-shadow cursor-pointer group" onClick={() => navigate("/jobs")}>
-            <CardContent className="p-5 flex flex-col gap-3">
-              <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors">
-                <Briefcase className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground text-base mb-1">Jobs</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  View the latest job opportunities and partnership openings
-                </p>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="mt-1 w-full font-medium"
-                onClick={(e) => { e.stopPropagation(); navigate("/jobs") }}
-              >
-                View Jobs
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border shadow-sm hover:shadow-md transition-shadow cursor-pointer group border-primary/20" onClick={() => navigate("/guide")}>
-            <CardContent className="p-5 flex flex-col gap-3">
-              <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors">
-                <BookOpen className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground text-base mb-1">Onboarding Guide</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Read the onboarding requirements and submission instructions before filling out the driver form
-                </p>
-              </div>
-              <Button
-                size="sm"
-                className="mt-1 w-full font-medium bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={(e) => { e.stopPropagation(); navigate("/guide") }}
-              >
-                Start Guide
-              </Button>
-            </CardContent>
-          </Card>
-        </section>
-
-        <section>
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">How It Works</h3>
-          <div className="space-y-3">
-            {[
-              { num: "1", label: "Read the onboarding guide" },
-              { num: "2", label: "Prepare your personal and vehicle details" },
-              { num: "3", label: "Submit the form and wait for review" },
-            ].map((item) => (
-              <div key={item.num} className="flex items-center gap-4 rounded-lg border border-border bg-card px-4 py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
-                  {item.num}
+        <section className="bg-slate-100 px-4 py-12 sm:px-6 lg:px-8" id="coverage">
+          <div className="mx-auto max-w-7xl">
+            <div className="rounded-lg bg-white p-5 shadow-xl shadow-slate-200/70 sm:p-8">
+              <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+                <div>
+                  <h2 className="text-2xl font-extrabold tracking-tight text-[#071a2e] sm:text-3xl">
+                    Driver Opportunities Across Australia
+                  </h2>
+                  <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
+                    We are building a national driver database for future delivery opportunities in major cities and regional areas.
+                  </p>
+                  <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+                    {cities.map((city) => {
+                      const Icon = city.icon
+                      return (
+                        <div key={city.name} className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-center shadow-sm">
+                          <Icon className="mx-auto h-9 w-9 text-[#1683ff]" />
+                          <p className="mt-3 text-sm font-bold text-[#071a2e]">{city.name}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <p className="mt-5 flex items-center justify-center gap-2 text-sm font-medium text-slate-600">
+                    <MapPin className="h-4 w-4 text-[#1683ff]" />
+                    Regional areas across Australia are welcome.
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="text-sm font-medium text-foreground">{item.label}</span>
+
+                <div>
+                  <h2 className="text-2xl font-extrabold tracking-tight text-[#071a2e] sm:text-3xl">Who We Work With</h2>
+                  <div className="mt-6 grid gap-3">
+                    {driverTypes.map((type) => {
+                      const Icon = type.icon
+                      return (
+                        <div key={type.title} className="flex gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1683ff]">
+                            <Icon className="h-6 w-6 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-[#071a2e]">{type.title}</h3>
+                            <p className="mt-2 text-sm leading-6 text-slate-600">{type.description}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </section>
 
-        <section>
-          <div className="rounded-lg border border-border bg-muted/40 px-4 py-4 flex gap-3">
-            <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="space-y-1.5">
-              <p className="text-sm text-foreground font-medium">Before you begin</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Please prepare your ID documents, driver licence, contact details, and vehicle information before submitting.
+        <section className="bg-slate-100 px-4 pb-12 sm:px-6 lg:px-8" id="how-it-works">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="text-2xl font-extrabold tracking-tight text-[#071a2e] sm:text-3xl">How It Works</h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {steps.map((item, index) => {
+                const Icon = item.icon
+                return (
+                  <div key={item.title} className="relative rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1683ff] text-sm font-bold text-white">
+                        {index + 1}
+                      </span>
+                      <Icon className="h-10 w-10 text-[#1683ff]" />
+                    </div>
+                    <p className="mt-5 text-sm font-bold uppercase tracking-wide text-[#1683ff]">{item.step}</p>
+                    <h3 className="mt-2 text-lg font-extrabold text-[#071a2e]">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-slate-600">{item.description}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-100 px-4 pb-12 sm:px-6 lg:px-8" id="register">
+          <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1fr_0.55fr]">
+            <div className="rounded-lg bg-white p-5 shadow-xl shadow-slate-200/80 sm:p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#071a2e] sm:text-3xl">Register as a Driver</h2>
+                <p className="mt-2 text-base text-slate-600">
+                  Submit your details to join the AusDriverHub driver database.
+                </p>
+              </div>
+
+              {submitted ? (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-6 text-center">
+                  <CheckCircle2 className="mx-auto h-12 w-12 text-[#1683ff]" />
+                  <h3 className="mt-4 text-xl font-extrabold text-[#071a2e]">Registration received</h3>
+                  <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
+                    Thanks for submitting your details. This homepage form is ready for the driver database flow and does not change the existing onboarding form.
+                  </p>
+                  <Button
+                    className="mt-5 rounded-lg bg-[#1683ff] text-white hover:bg-[#0f72e8]"
+                    onClick={() => setSubmitted(false)}
+                    type="button"
+                  >
+                    Submit another registration
+                  </Button>
+                </div>
+              ) : (
+                <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
+                  <Field label="Full name" name="fullName" placeholder="Enter your full name" required />
+                  <Field label="Mobile number" name="mobile" placeholder="04XX XXX XXX" required type="tel" />
+                  <Field label="Email" name="email" placeholder="you@example.com" required type="email" />
+                  <SelectField label="State" name="state" options={states} placeholder="Select your state" required />
+                  <Field label="City / Suburb" name="suburb" placeholder="Enter your suburb" required />
+                  <Field label="Postcode" name="postcode" placeholder="Enter postcode" inputMode="numeric" required />
+                  <SelectField label="Vehicle type" name="vehicleType" options={vehicleTypes} placeholder="Select vehicle type" required />
+                  <SelectField label="Driver licence type" name="licenceType" options={licenceTypes} placeholder="Select licence type" required />
+                  <Field label="ABN if applicable" name="abn" placeholder="Enter ABN" />
+                  <SelectField label="Delivery experience" name="experience" options={experienceOptions} placeholder="Select experience" />
+                  <SelectField label="Availability" name="availability" options={availabilityOptions} placeholder="Select availability" required />
+                  <SelectField label="Preferred work type" name="workType" options={workTypes} placeholder="Select work type" required />
+                  <div className="md:col-span-2">
+                    <label className="text-sm font-bold text-[#071a2e]" htmlFor="notes">Notes</label>
+                    <textarea
+                      className="mt-1 min-h-28 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#1683ff] focus:ring-4 focus:ring-blue-100"
+                      id="notes"
+                      name="notes"
+                      placeholder="Additional information..."
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Button className="h-12 w-full rounded-lg bg-[#1683ff] text-base font-bold text-white hover:bg-[#0f72e8]" type="submit">
+                      Submit Driver Registration
+                      <Send className="h-5 w-5" />
+                    </Button>
+                    <p className="mt-3 text-center text-xs leading-5 text-slate-500">
+                      By submitting this form, you agree to be contacted about suitable driver opportunities. Registration does not guarantee work.
+                    </p>
+                    <button
+                      className="mt-3 w-full text-center text-sm font-semibold text-[#1683ff] hover:text-[#0f72e8]"
+                      onClick={() => navigate("/guide")}
+                      type="button"
+                    >
+                      Already onboarded? Continue to guide
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+
+            <aside className="rounded-lg border border-blue-900/30 bg-[#061322] p-6 text-white shadow-xl shadow-slate-200/80">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#1683ff]/40 bg-[#1683ff]/15">
+                <ClipboardCheck className="h-7 w-7 text-[#36a3ff]" />
+              </div>
+              <h2 className="mt-8 text-3xl font-extrabold leading-tight">Job Board Coming Soon</h2>
+              <p className="mt-4 text-sm leading-7 text-slate-300">
+                We are preparing a driver opportunity board for different Australian cities and regions. Register now to be included in our driver database.
               </p>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Please read the delivery and photo proof requirements carefully to avoid delays in review.
-              </p>
+              <Button
+                className="mt-7 h-12 w-full rounded-lg bg-[#1683ff] font-bold text-white hover:bg-[#0f72e8]"
+                onClick={() => scrollToSection("#register")}
+                type="button"
+              >
+                Register First
+              </Button>
+            </aside>
+          </div>
+        </section>
+
+        <section className="bg-slate-100 px-4 pb-14 sm:px-6 lg:px-8" id="faq">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-6 lg:grid-cols-[0.55fr_1fr]">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#071a2e] sm:text-3xl">Frequently Asked Questions</h2>
+                <p className="mt-3 text-base leading-7 text-slate-600">
+                  Clear answers for drivers registering interest with AusDriverHub.
+                </p>
+              </div>
+              <div className="space-y-3">
+                {faqs.map((faq) => (
+                  <details key={faq.question} className="group rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-[#071a2e]">
+                      {faq.question}
+                      <ChevronDown className="h-5 w-5 shrink-0 text-[#1683ff] transition group-open:rotate-180" />
+                    </summary>
+                    <p className="mt-3 text-sm leading-6 text-slate-600">{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="py-6 text-center">
-        <p className="text-xs text-muted-foreground">AusDriverHub &copy; {new Date().getFullYear()}</p>
+      <footer className="bg-[#061322] px-4 py-10 text-white sm:px-6 lg:px-8" id="contact">
+        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.2fr_1fr_1fr]">
+          <div>
+            <h2 className="text-2xl font-extrabold">AusDriver<span className="text-[#1683ff]">Hub</span></h2>
+            <p className="mt-3 max-w-sm text-sm leading-6 text-slate-300">
+              Connecting Australia's drivers with future delivery opportunities.
+            </p>
+            <p className="mt-4 text-sm font-semibold text-blue-100">Australia-wide driver registration platform.</p>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wide text-slate-400">Footer links</h3>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-300">
+              {navItems.map((item) => (
+                <button key={item.href} className="text-left hover:text-white" onClick={() => scrollToSection(item.href)} type="button">
+                  {item.label}
+                </button>
+              ))}
+              <span>Privacy Policy</span>
+              <span>Terms & Conditions</span>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wide text-slate-400">For drivers</h3>
+            <button className="mt-4 text-left text-sm font-semibold text-[#36a3ff] hover:text-white" onClick={() => scrollToSection("#register")} type="button">
+              Register your details
+            </button>
+          </div>
+        </div>
       </footer>
+    </div>
+  )
+}
+
+function Field({
+  label,
+  name,
+  placeholder,
+  required,
+  type = "text",
+  inputMode,
+}: {
+  label: string
+  name: string
+  placeholder: string
+  required?: boolean
+  type?: string
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"]
+}) {
+  return (
+    <div>
+      <label className="text-sm font-bold text-[#071a2e]" htmlFor={name}>
+        {label}
+        {required && <span className="text-[#1683ff]"> *</span>}
+      </label>
+      <input
+        className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#1683ff] focus:ring-4 focus:ring-blue-100"
+        id={name}
+        inputMode={inputMode}
+        name={name}
+        placeholder={placeholder}
+        required={required}
+        type={type}
+      />
+    </div>
+  )
+}
+
+function SelectField({
+  label,
+  name,
+  options,
+  placeholder,
+  required,
+}: {
+  label: string
+  name: string
+  options: string[]
+  placeholder: string
+  required?: boolean
+}) {
+  return (
+    <div>
+      <label className="text-sm font-bold text-[#071a2e]" htmlFor={name}>
+        {label}
+        {required && <span className="text-[#1683ff]"> *</span>}
+      </label>
+      <select
+        className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-sm outline-none transition focus:border-[#1683ff] focus:ring-4 focus:ring-blue-100"
+        defaultValue=""
+        id={name}
+        name={name}
+        required={required}
+      >
+        <option disabled value="">
+          {placeholder}
+        </option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }
