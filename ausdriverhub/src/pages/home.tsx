@@ -278,7 +278,7 @@ export default function Home() {
               {heroSlides.map((slide, index) => (
                 <img
                   alt={slide.alt}
-                  className={`absolute inset-0 h-full min-h-[320px] w-full object-cover transition-opacity duration-700 lg:min-h-[530px] ${
+                  className={`absolute inset-0 h-full min-h-[320px] w-full object-contain transition-opacity duration-700 lg:min-h-[530px] ${
                     index === currentHeroSlide ? "opacity-100" : "opacity-0"
                   }`}
                   key={slide.alt}
