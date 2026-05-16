@@ -24,6 +24,8 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import heroImage from "@/assets/driver-network-hero.webp"
+import heroImage2 from "@/assets/driver-network-hero-2.webp"
+import heroImage3 from "@/assets/driver-network-hero-3.webp"
 
 const navItems = [
   { label: "Home", href: "#home" },
@@ -132,16 +134,12 @@ const heroSlides = [
     alt: "Delivery driver with van and parcels in an Australian city",
   },
   {
-    src: heroImage,
-    alt: "Courier driver preparing parcels beside a delivery van",
+    src: heroImage2,
+    alt: "Australia-wide logistics network with delivery trucks and route coverage",
   },
   {
-    src: heroImage,
-    alt: "Owner driver delivering parcels across Australia",
-  },
-  {
-    src: heroImage,
-    alt: "Australian delivery driver network with city and regional coverage",
+    src: heroImage3,
+    alt: "Australian driver network recruitment with delivery vans and national coverage",
   },
 ]
 
