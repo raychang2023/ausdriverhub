@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
-  ArrowRight,
   Box,
   Building2,
   CalendarClock,
@@ -237,12 +236,12 @@ export default function Home() {
                 </Button>
                 <Button
                   className="h-13 w-full rounded-lg border border-white/25 bg-white/5 px-7 text-base font-bold text-white hover:bg-white/12 sm:w-auto"
-                  onClick={() => scrollToSection("#how-it-works")}
+                  onClick={() => navigate("/guide")}
                   type="button"
                   variant="outline"
                 >
-                  See How It Works
-                  <ArrowRight className="h-5 w-5" />
+                  Start Guide
+                  <FileText className="h-5 w-5" />
                 </Button>
               </div>
             </div>
