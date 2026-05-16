@@ -89,7 +89,7 @@ const steps = [
   {
     step: "Step 2",
     title: "We review your profile",
-    description: "We review your location, vehicle type, experience and availability.",
+    description: "We review your location and contact details when suitable opportunities are being considered.",
     icon: ClipboardCheck,
   },
   {
@@ -107,7 +107,7 @@ const faqs = [
   },
   {
     question: "Do I need my own vehicle?",
-    answer: "Many delivery opportunities require a suitable vehicle. Add your vehicle type in the form.",
+    answer: "Many delivery opportunities require a suitable vehicle. If a relevant opportunity is available, we may ask for vehicle details later.",
   },
   {
     question: "Do I need an ABN?",
@@ -124,11 +124,6 @@ const faqs = [
 ]
 
 const states = ["NSW", "VIC", "QLD", "WA", "SA", "ACT", "TAS", "NT"]
-const vehicleTypes = ["Car", "Van", "Ute", "Truck", "Motorbike", "Other"]
-const licenceTypes = ["Car licence", "Light rigid", "Medium rigid", "Heavy rigid", "Heavy combination", "Other"]
-const experienceOptions = ["New to delivery", "Less than 1 year", "1-3 years", "3+ years"]
-const availabilityOptions = ["Weekdays", "Weekends", "Evenings", "Flexible"]
-const workTypes = ["Parcel delivery", "Courier runs", "Owner driver", "Flexible delivery work"]
 
 export default function Home() {
   const navigate = useNavigate()
@@ -389,21 +384,6 @@ export default function Home() {
                   <SelectField label="State" name="state" options={states} placeholder="Select your state" required />
                   <Field label="City / Suburb" name="suburb" placeholder="Enter your suburb" required />
                   <Field label="Postcode" name="postcode" placeholder="Enter postcode" inputMode="numeric" required />
-                  <SelectField label="Vehicle type" name="vehicleType" options={vehicleTypes} placeholder="Select vehicle type" required />
-                  <SelectField label="Driver licence type" name="licenceType" options={licenceTypes} placeholder="Select licence type" required />
-                  <Field label="ABN if applicable" name="abn" placeholder="Enter ABN" />
-                  <SelectField label="Delivery experience" name="experience" options={experienceOptions} placeholder="Select experience" />
-                  <SelectField label="Availability" name="availability" options={availabilityOptions} placeholder="Select availability" required />
-                  <SelectField label="Preferred work type" name="workType" options={workTypes} placeholder="Select work type" required />
-                  <div className="md:col-span-2">
-                    <label className="text-sm font-bold text-[#071a2e]" htmlFor="notes">Notes</label>
-                    <textarea
-                      className="mt-1 min-h-28 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#1683ff] focus:ring-4 focus:ring-blue-100"
-                      id="notes"
-                      name="notes"
-                      placeholder="Additional information..."
-                    />
-                  </div>
                   <div className="md:col-span-2">
                     <Button className="h-12 w-full rounded-lg bg-[#1683ff] text-base font-bold text-white hover:bg-[#0f72e8]" type="submit">
                       Submit Driver Registration
