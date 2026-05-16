@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { Truck as TruckIcon, ClipboardList, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { supabase } from "@/lib/supabase"
+import { pbSignOut, supabase } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 
 type AdminLayoutProps = {
@@ -15,7 +15,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   async function handleLogout() {
-    await supabase.auth.signOut()
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      await pbSignOut()
+    } else {
+      await supabase.auth.signOut()
+    }
     navigate("/admin/login")
   }
 

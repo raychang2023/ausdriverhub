@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Navigate } from "react-router-dom"
-import { supabase } from "@/lib/supabase"
+import { getPBAuthToken, supabase } from "@/lib/supabase"
 import { Loader as Loader2 } from "lucide-react"
 
 type ProtectedRouteProps = {
@@ -12,6 +12,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [authenticated, setAuthenticated] = useState(false)
 
   useEffect(() => {
+    if (import.meta.env.VITE_USE_POCKETBASE) {
+      setAuthenticated(!!getPBAuthToken())
+      setLoading(false)
+      return
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthenticated(!!session)
       setLoading(false)
