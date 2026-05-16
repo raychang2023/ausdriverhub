@@ -237,7 +237,7 @@ export type DriverRegistration = {
 export type DriverDocument = {
   id: string
   registrationid: string
-  documenttype: "license" | "passport" | "vehicle"
+  documenttype: "license" | "passport" | "vehicle" | "pdf"
   fileurl: string
   filename: string
   createdat: string
@@ -257,4 +257,5 @@ export const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   license: "Driver License",
   passport: "Passport",
   vehicle: "Vehicle Photo",
+  pdf: "Registration PDF",
 }

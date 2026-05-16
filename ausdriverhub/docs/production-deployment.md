@@ -120,7 +120,7 @@ Production PocketBase collections needed:
 `driverdocuments` fields used by the frontend:
 
 - `registrationid` relation/text
-- `documenttype` select/text: `license`, `passport`, `vehicle`
+- `documenttype` select/text: `license`, `passport`, `vehicle`, `pdf`
 - `filename` text
 - `fileurl` text
 - `fileupload` file
@@ -186,6 +186,6 @@ The preflight check blocks the most dangerous mistake: using `/var/www/pb-test/p
 - Admin login/logout works.
 - Existing uploaded document images and PDF links still open.
 
-## Known PocketBase Difference
+## PocketBase File Storage
 
-In PocketBase mode, identity and vehicle images are stored in PocketBase local file storage. The generated PDF URL is not currently uploaded to PocketBase; PDF handling remains part of the Supabase path unless a dedicated PocketBase PDF file field/collection is added later.
+In PocketBase mode, identity images, vehicle images, and generated registration PDFs are stored in PocketBase local file storage under the production `pb_data` directory. The generated PDF is uploaded as a `driverdocuments` record with `documenttype = "pdf"`, and its URL is written back to `driverregistrations.pdfurl`.

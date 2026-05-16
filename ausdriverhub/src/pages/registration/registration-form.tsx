@@ -104,6 +104,20 @@ export default function RegistrationForm() {
     return publicUrl
   }
 
+  async function uploadPocketBasePdf(pdfBlob: Blob, registrationId: string): Promise<string> {
+    const pdfFile = new File([pdfBlob], `registration-${registrationId}.pdf`, { type: "application/pdf" })
+    const doc = await pbCreateRecord("driverdocuments", {
+      registrationid: registrationId,
+      documenttype: "pdf",
+      filename: pdfFile.name,
+      fileurl: "",
+    })
+    const docId = String((doc as any).id)
+    const pdfUrl = await pbUploadFile("driverdocuments", docId, "fileupload", pdfFile)
+    await pbUpdateRecord("driverdocuments", docId, { fileurl: pdfUrl })
+    return pdfUrl
+  }
+
   async function onSubmit(values: FormValues) {
     if (!validateFiles()) return
     setIsSubmitting(true)
@@ -193,8 +207,8 @@ export default function RegistrationForm() {
       const pdfBlob = await generateDriverPDF(fullRegistration, savedDocs)
 
       if (import.meta.env.VITE_USE_POCKETBASE) {
-        // PocketBase: store pdfurl
-        await pbUpdateRecord("driverregistrations", regId, { pdfurl: "" })
+        const pdfUrl = await uploadPocketBasePdf(pdfBlob, regId)
+        await pbUpdateRecord("driverregistrations", regId, { pdfurl: pdfUrl })
       } else {
         const pdfPath = `${regId}/registration-${regId}.pdf`
         await supabase.storage.from("driver-documents").upload(pdfPath, pdfBlob, { contentType: "application/pdf", upsert: true })
