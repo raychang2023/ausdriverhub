@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
+    "preflight:production": "node scripts/preflight-production.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
