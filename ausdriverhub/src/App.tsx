@@ -27,6 +27,14 @@ export function App() {
           }
         />
         <Route
+          path="/admin/applications"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/drivers/:id"
           element={
             <ProtectedRoute>

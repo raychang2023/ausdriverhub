@@ -10,7 +10,7 @@ import {
   useReactTable,
   type SortingState,
 } from "@tanstack/react-table"
-import { Search, ChevronLeft, ChevronRight, ArrowUpDown, Eye, Users, Clock, CircleCheck as CheckCircle2, FileText, Trash2 } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, ArrowUpDown, Eye, Users, Clock, CircleCheck as CheckCircle2, FileText, Trash2, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -28,6 +28,11 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 const columnHelper = createColumnHelper<DriverRegistration>()
+
+function escapeCsvValue(value: unknown): string {
+  const text = value == null ? "" : String(value)
+  return `"${text.replace(/"/g, '""')}"`
+}
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -215,12 +220,49 @@ export default function AdminDashboard() {
     approved: registrations.filter((r) => r.status === "approved").length,
   }), [registrations])
 
+  function exportApplicationsCsv() {
+    const rows = table.getFilteredRowModel().rows.map((row) => row.original)
+    const headers = [
+      "Full Name",
+      "Phone",
+      "Address",
+      "City / Region",
+      "Available Days",
+      "Status",
+      "Submitted At",
+      "PDF URL",
+    ]
+    const lines = [
+      headers.map(escapeCsvValue).join(","),
+      ...rows.map((registration) => [
+        registration.fullname,
+        registration.phone,
+        registration.address,
+        registration.city,
+        registration.availabledays.join("; "),
+        registration.status,
+        registration.created_at,
+        registration.pdfurl || "",
+      ].map(escapeCsvValue).join(",")),
+    ]
+    const blob = new Blob([`\uFEFF${lines.join("\r\n")}`], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    const date = new Date().toISOString().slice(0, 10)
+    link.href = url
+    link.download = `ausdriverhub-applications-${date}.csv`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Driver Registrations</h1>
-          <p className="text-sm text-muted-foreground mt-1">Review and manage driver onboarding submissions</p>
+          <h1 className="text-2xl font-bold text-foreground">Driver Applications</h1>
+          <p className="text-sm text-muted-foreground mt-1">Review, manage and export driver onboarding submissions</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -247,15 +289,27 @@ export default function AdminDashboard() {
         <Card className="border-border shadow-sm">
           <CardHeader className="px-4 pt-4 pb-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <CardTitle className="text-base">All Registrations</CardTitle>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name, phone..."
-                  value={globalFilter}
-                  onChange={(e) => setGlobalFilter(e.target.value)}
-                  className="pl-8 h-8 text-sm w-52"
-                />
+              <CardTitle className="text-base">All Applications</CardTitle>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5 border-primary/30 text-primary hover:bg-primary/5"
+                  onClick={exportApplicationsCsv}
+                  disabled={loading || table.getFilteredRowModel().rows.length === 0}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Export CSV
+                </Button>
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name, phone..."
+                    value={globalFilter}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                    className="h-8 w-52 pl-8 text-sm"
+                  />
+                </div>
               </div>
             </div>
           </CardHeader>
