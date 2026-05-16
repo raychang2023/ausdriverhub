@@ -20,6 +20,10 @@ export type AddressSuggestion = {
   address?: AddressDetails
 }
 
+function getLeadingStreetNumber(value: string): string {
+  return value.trim().match(/^((?:unit\s+)?[a-z0-9]+(?:[/-][a-z0-9]+)?)\s+/i)?.[1] || ""
+}
+
 export function useAddressAutocomplete() {
   const [query, setQuery] = useState("")
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
@@ -88,7 +92,8 @@ export function useAddressAutocomplete() {
       if (a.house_number && a.road) {
         parts.push(`${a.house_number} ${a.road}`)
       } else if (a.road) {
-        parts.push(a.road)
+        const typedStreetNumber = getLeadingStreetNumber(query)
+        parts.push(typedStreetNumber ? `${typedStreetNumber} ${a.road}` : a.road)
       }
       const locality = a.suburb || a.city || a.town || a.village
       if (locality) parts.push(locality)
